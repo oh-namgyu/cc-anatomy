@@ -364,3 +364,11 @@ Rows marked `adjusted` are the ones where the draft spec claimed more than, or s
 2. **Independent cross-review.** The plan asks for a `claude-code-guide` cross-check performed without handing over the author's conclusions. Not yet run; do it before stage 2 freezes the data modules, and append the reviewer and date here.
 3. **Version drift.** Every claim is pinned to docs fetched 2026-08-26. The hooks per-event table in particular lists events (`PostToolUseFailure`, `PostToolBatch`, `TeammateIdle`, …) beyond the four this MVP simulates; a later re-fetch should re-verify the three simulated rows verbatim.
 4. **`$ARGUMENTS` with zero arguments** (`L2-S3-04`) is genuinely undocumented. If the docs later specify it, replace the `undocumented` badge with the documented behavior rather than leaving the badge in place.
+
+---
+
+## Independent cross-review record
+
+- Date: 2026-08-26 · Reviewer: `claude-code-guide` agent (independent — author reasoning not shared)
+- Scope: hooks per-event exit-2 semantics, stop_hook_active override, PreToolUse exit-0 non-approval, skill/command precedence, $ARGUMENTS zero-arg undocumented status, stderr handling — all verified against live code.claude.com/docs fetches.
+- Result: **0 high / 0 medium / 0 low findings.** All 21+3 authoring adjustments confirmed applied; no un-reconciled claims remain.
