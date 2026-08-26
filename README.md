@@ -42,7 +42,7 @@ instead of a guess.
 
 ## Try it
 
-**Live demo:** _(URL to be filled in at deploy time)_
+**Live demo:** https://cc-anatomy.vercel.app
 
 **Locally** — clone and serve the directory with anything that serves static
 files:
