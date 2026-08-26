@@ -299,6 +299,14 @@ code {
   color: var(--sig);
 }
 
+.card-progress[data-state="none"] {
+  color: var(--text-mute);
+}
+
+.card-progress[data-state="completed"] {
+  color: var(--go);
+}
+
 /* ---------- lesson ---------- */
 
 .lesson-head {
@@ -872,6 +880,8 @@ code {
 
 /* ---------- responsive ---------- */
 
+/* Below this width the stage stacks: diagram on top, explanation under it.
+   The contract is "stacked at 860 and narrower"; starting at 980 covers it. */
 @media (max-width: 980px) {
   .stage {
     grid-template-columns: minmax(0, 1fr);
@@ -880,6 +890,41 @@ code {
   .panel {
     border-left: 1px solid var(--rule);
     border-top: 2px solid var(--sig-line);
+  }
+}
+
+/* Touch sizing: at tablet width and below every control is at least 40px on
+   its short side, including the step dots (padding gives the hit area, the
+   painted dot stays small through background-clip). */
+@media (max-width: 860px) {
+  .ctrl {
+    min-height: 44px;
+  }
+
+  .chip,
+  .seg,
+  .loc-btn {
+    min-height: 40px;
+  }
+
+  .widget-values {
+    gap: 8px;
+  }
+
+  .dot {
+    width: 40px;
+    height: 40px;
+    padding: 15px;
+    border: 0;
+    background-clip: content-box;
+  }
+
+  .dot.is-on {
+    box-shadow: none;
+  }
+
+  .dots {
+    gap: 0;
   }
 }
 

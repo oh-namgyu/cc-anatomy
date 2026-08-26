@@ -17,7 +17,7 @@
     <span class="brand-name">cc&#8209;anatomy</span>
   </a>
   <p class="brand-note" data-t="tagline">A conceptual model of documented behavior — not the actual implementation.</p>
-  <div class="locale" role="group" aria-label="Language">
+  <div class="locale" role="group" data-t-aria="language" aria-label="Language">
     <button type="button" class="loc-btn" data-locale="en" aria-pressed="true">EN</button>
     <button type="button" class="loc-btn" data-locale="ko" aria-pressed="false">KO</button>
   </div>
@@ -26,7 +26,7 @@
 <main id="view" class="view"></main>
 
 <footer class="footer">
-  <p data-t="unofficial">Unofficial community learning tool. Not affiliated with Anthropic.</p>
+  <p data-t="unofficial">Unofficial community project — a conceptual model of documented behavior, not affiliated with Anthropic.</p>
 </footer>
 
 <!-- ---------- templates ---------- -->
@@ -35,7 +35,7 @@
   <section class="home">
     <div class="hero">
       <p class="hero-kicker" data-t="heroKicker">open it up</p>
-      <h1 class="hero-title" data-t="heroTitle">See what happens after you hit enter.</h1>
+      <h1 class="hero-title" data-t="heroTitle">See how Claude Code actually runs — step by step.</h1>
       <p class="hero-lead" data-t="heroLead">Each lesson is a diagram you can drive. Change an input, replay the flow step by step, and watch where the signal goes.</p>
     </div>
     <ul class="grid" data-grid></ul>
@@ -68,7 +68,7 @@
 
     <div class="stage">
       <div class="canvas" data-canvas></div>
-      <aside class="panel" aria-live="polite" aria-atomic="true" aria-label="Current step">
+      <aside class="panel" aria-live="polite" aria-atomic="true" data-t-aria="currentStep" aria-label="Current step">
         <p class="panel-step" data-stepline></p>
         <p class="panel-badge"><span class="badge" data-badge hidden></span></p>
         <p class="panel-text" data-explain></p>
@@ -77,11 +77,11 @@
 
     <div class="controlbar">
       <div class="ctrl-group">
-        <button type="button" class="ctrl" data-prev aria-label="Previous step">&#9664;</button>
-        <button type="button" class="ctrl" data-next aria-label="Next step">&#9654;</button>
-        <button type="button" class="ctrl ctrl-auto" data-auto aria-pressed="false" aria-label="Auto play">&#9205;<span class="ctrl-label" data-t="auto">auto</span></button>
+        <button type="button" class="ctrl" data-prev data-t-aria="prevStep" aria-label="Previous step">&#9664;</button>
+        <button type="button" class="ctrl" data-next data-t-aria="nextStep" aria-label="Next step">&#9654;</button>
+        <button type="button" class="ctrl ctrl-auto" data-auto aria-pressed="false" data-t-aria="autoPlay" aria-label="Play the scenario automatically">&#9205;<span class="ctrl-label" data-t="auto">auto</span></button>
       </div>
-      <div class="dots" data-dots role="tablist" aria-label="Steps"></div>
+      <div class="dots" data-dots role="tablist" data-t-aria="stepList" aria-label="Steps"></div>
       <p class="stepind" data-indicator></p>
     </div>
 

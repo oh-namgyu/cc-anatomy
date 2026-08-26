@@ -5,9 +5,16 @@
  * carry `group: [ids]` are drawn as a cluster box around their members, which
  * is how a lesson expresses "the docs list these together with no order among
  * them" — highlighting the cluster highlights every member at once.
+ *
+ * Accessibility today: the SVG is one labelled image, and the explanation
+ * panel is the live region that announces each step — a screen reader follows
+ * the lesson through the panel, not the picture. v1.1 roadmap: give every node
+ * its own accessible name and describe the active step's incoming edge in the
+ * live region, so the flow itself is navigable rather than only narrated.
  */
 
 import { pickText } from './locale.js';
+import { t } from '../ui-text.js';
 import { edgeKey, normalizeEdgeRef } from './schema-refs.js';
 import { layoutNodes, viewBoxOf, edgePoints, roundedPath } from './diagram-layout.js';
 
@@ -114,7 +121,7 @@ export function createDiagram(container, diagram, locale = 'en') {
       viewBox: `${box.x} ${box.y} ${box.w} ${box.h}`,
       preserveAspectRatio: 'xMidYMid meet',
       role: 'img',
-      'aria-label': 'Lesson flow diagram',
+      'aria-label': t('diagramLabel', current),
     }, container);
     defs(root);
     const clusterLayer = svgEl('g', { class: 'layer-clusters' }, root);

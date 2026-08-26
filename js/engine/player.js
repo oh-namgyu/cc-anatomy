@@ -9,6 +9,7 @@
 
 import { pickText } from './locale.js';
 import { paintText } from './richtext.js';
+import { t } from '../ui-text.js';
 
 export const AUTO_MS = 1600;
 
@@ -62,7 +63,7 @@ export function createPlayer({ diagram, els, locale = 'en', autoMs = AUTO_MS, on
       dot.className = 'dot';
       dot.dataset.dot = String(i);
       dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', `Step ${i + 1}`);
+      dot.setAttribute('aria-label', `${t('stepOf', current)} ${i + 1}`);
       dot.addEventListener('click', () => goto(i));
       els.dots.appendChild(dot);
       dotEls.push(dot);
@@ -171,7 +172,9 @@ export function createPlayer({ diagram, els, locale = 'en', autoMs = AUTO_MS, on
     setLocale(next) {
       current = next;
       diagram.setLocale(next);
-      if (scenario) paint();
+      if (!scenario) return;
+      buildDots();
+      paint();
     },
     goto,
     next: onNext,

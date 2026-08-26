@@ -50,13 +50,30 @@ export const UI = {
   scoreSuffix: { en: 'correct', ko: '정답' },
   learnMore: { en: 'Learn more', ko: '더 알아보기' },
   asOf: { en: 'Documentation baseline', ko: '문서 기준일' },
+
+  /* accessible names — applied as aria-label via [data-t-aria] */
+  language: { en: 'Language', ko: '언어' },
+  prevStep: { en: 'Previous step', ko: '이전 단계' },
+  nextStep: { en: 'Next step', ko: '다음 단계' },
+  autoPlay: { en: 'Play the scenario automatically', ko: '시나리오 자동 재생' },
+  stepList: { en: 'Steps', ko: '단계 목록' },
+  currentStep: { en: 'Current step', ko: '현재 단계' },
+  diagramLabel: { en: 'Lesson flow diagram', ko: '레슨 흐름 다이어그램' },
 };
 
-/** Replace the text of every `[data-t]` element under `root`. */
+/**
+ * Fill every `[data-t]` element's text and every `[data-t-aria]` element's
+ * accessible name under `root`, in `locale`. Called on mount and on every
+ * locale switch, so assistive tech follows the language toggle too.
+ */
 export function applyChrome(root, locale) {
   for (const node of root.querySelectorAll('[data-t]')) {
     const value = UI[node.dataset.t];
     if (value) node.textContent = pickText(value, locale);
+  }
+  for (const node of root.querySelectorAll('[data-t-aria]')) {
+    const value = UI[node.dataset.tAria];
+    if (value) node.setAttribute('aria-label', pickText(value, locale));
   }
 }
 

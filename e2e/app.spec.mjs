@@ -223,3 +223,68 @@ test.describe('narrow viewport', () => {
     await expect(els(page).indicator).toHaveText('2 / 4');
   });
 });
+
+test.describe('touch layout at 860px', () => {
+  test.use({ viewport: { width: 860, height: 900 } });
+
+  test('the stage stacks, widgets wrap, and every control is at least 40px', async ({ page }) => {
+    await page.goto('/#/lesson/l3-hooks');
+    await expect(page.locator('body[data-ready="true"]')).toBeAttached();
+
+    const canvas = await page.locator('.canvas').boundingBox();
+    const panel = await page.locator('.panel').boundingBox();
+    expect(panel.y).toBeGreaterThanOrEqual(canvas.y + canvas.height);
+    expect(Math.round(panel.width)).toBeCloseTo(Math.round(canvas.width), -1);
+
+    // the widget zone wraps instead of overflowing its container
+    const zone = await page.locator('.widget-zone').boundingBox();
+    for (const id of ['hook', 'exit']) {
+      const box = await page.locator(`.widget[data-widget="${id}"]`).boundingBox();
+      expect(box.x + box.width).toBeLessThanOrEqual(zone.x + zone.width + 1);
+    }
+
+    const controls = ['[data-prev]', '[data-next]', '[data-auto]', '[data-quiz-open]',
+      '.chip', '.seg', '.dot', '.loc-btn'];
+    for (const selector of controls) {
+      const box = await page.locator(selector).first().boundingBox();
+      expect(Math.min(box.width, box.height), `${selector} touch target`).toBeGreaterThanOrEqual(40);
+    }
+  });
+});
+
+test.describe('accessibility', () => {
+  test('controls, the diagram and the live region are named in both locales', async ({ page }) => {
+    await page.goto('/#/lesson/l1-agent-loop');
+    await expect(page.locator('body[data-ready="true"]')).toBeAttached();
+
+    const panel = page.locator('.panel');
+    await expect(panel).toHaveAttribute('aria-live', 'polite');
+    await expect(panel).toHaveAttribute('aria-label', 'Current step');
+    await expect(page.locator('[data-next]')).toHaveAttribute('aria-label', 'Next step');
+    await expect(page.locator('svg.diagram')).toHaveAttribute('aria-label', 'Lesson flow diagram');
+    await expect(page.locator('.dot').first()).toHaveAttribute('aria-label', 'Step 1');
+
+    await page.locator('.loc-btn[data-locale="ko"]').click();
+    await expect(panel).toHaveAttribute('aria-label', '현재 단계');
+    await expect(page.locator('[data-next]')).toHaveAttribute('aria-label', '다음 단계');
+    await expect(page.locator('svg.diagram')).toHaveAttribute('aria-label', '레슨 흐름 다이어그램');
+    await expect(page.locator('.dot').first()).toHaveAttribute('aria-label', '단계 1');
+  });
+
+  test('the keyboard drives a real lesson and focus is visible', async ({ page }) => {
+    await page.goto('/#/lesson/l2-slash-commands');
+    await expect(page.locator('body[data-ready="true"]')).toBeAttached();
+    await page.keyboard.press('ArrowRight');
+    await expect(els(page).indicator).toHaveText('2 / 7');
+    await page.keyboard.press('ArrowLeft');
+    await expect(els(page).indicator).toHaveText('1 / 7');
+
+    await page.keyboard.press('Tab');
+    const focus = await page.evaluate(() => {
+      const node = document.activeElement;
+      return { tag: node.tagName, outline: window.getComputedStyle(node).outlineWidth };
+    });
+    expect(focus.tag).not.toBe('BODY');
+    expect(parseFloat(focus.outline)).toBeGreaterThan(0);
+  });
+});
