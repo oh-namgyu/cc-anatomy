@@ -4,3 +4,7 @@ test-results/
 playwright-report/
 blob-report/
 .DS_Store
+
+# env files (preventive — no secrets in this project)
+.env*
+!.env.example
