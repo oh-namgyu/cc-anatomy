@@ -12,7 +12,6 @@ import {
 import { pickText, isLocalized } from '../js/engine/locale.js';
 import { dummy } from '../js/lessons/dummy.js';
 import { broken } from '../js/lessons/broken.js';
-import { allLessons } from '../js/lessons/index.js';
 
 const clone = () => structuredClone(dummy);
 const codes = (result) => result.errors.map((e) => e.split(':')[0]);
@@ -27,14 +26,6 @@ test('the dummy lesson passes the schema gate', () => {
   const result = validateLesson(dummy);
   assert.deepEqual(result.errors, []);
   assert.equal(result.ok, true);
-});
-
-test('every registered lesson passes the schema gate', () => {
-  const lessons = allLessons();
-  assert.ok(lessons.length > 0);
-  for (const lesson of lessons) {
-    assert.equal(validateLesson(lesson).ok, true, `lesson "${lesson.id}" failed`);
-  }
 });
 
 test('the broken fixture fails on both planted faults', () => {

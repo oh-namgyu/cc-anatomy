@@ -50,7 +50,7 @@
       <span class="card-intro" data-intro></span>
       <span class="card-foot">
         <span class="card-meta" data-meta></span>
-        <span class="card-progress" data-progress hidden></span>
+        <span class="card-progress" data-progress></span>
       </span>
     </a>
   </li>
@@ -68,7 +68,7 @@
 
     <div class="stage">
       <div class="canvas" data-canvas></div>
-      <aside class="panel" aria-live="polite">
+      <aside class="panel" aria-live="polite" aria-atomic="true" aria-label="Current step">
         <p class="panel-step" data-stepline></p>
         <p class="panel-badge"><span class="badge" data-badge hidden></span></p>
         <p class="panel-text" data-explain></p>
@@ -86,6 +86,21 @@
     </div>
 
     <p class="hint" data-t="hint">Use &#8592; and &#8594; to step through.</p>
+
+    <div class="lesson-foot">
+      <button type="button" class="ctrl quiz-toggle" data-quiz-open aria-expanded="false" aria-controls="quiz-panel">
+        <span class="ctrl-label" data-t="quizOpen">Quiz</span>
+      </button>
+      <p class="quiz-lead" data-t="quizLead">Three questions on what the documentation says. Answering all three marks the lesson complete.</p>
+    </div>
+
+    <section class="quiz" id="quiz-panel" data-quiz hidden></section>
+
+    <footer class="sources" data-sources hidden>
+      <p class="sources-head" data-t="learnMore">Learn more</p>
+      <ul class="sources-list" data-source-list></ul>
+      <p class="sources-note"><span data-t="asOf">Documentation baseline</span>: <span data-as-of></span></p>
+    </footer>
   </section>
 </template>
 

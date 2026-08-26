@@ -49,15 +49,27 @@ export function readProgress() {
   return value && typeof value === 'object' ? value : {};
 }
 
-/** Record the furthest step reached in a lesson. */
+/**
+ * Record the furthest step reached in a lesson. Stepping through marks a
+ * lesson as viewed; only the quiz marks it done (see markComplete).
+ */
 export function markProgress(lessonId, step, total) {
   const all = readProgress();
   const prev = all[lessonId] || { step: 0, total, done: false };
   all[lessonId] = {
     step: Math.max(prev.step || 0, step),
     total,
-    done: prev.done || step >= total - 1,
+    done: !!prev.done,
   };
+  writeJSON(PROGRESS_KEY, all);
+  return all[lessonId];
+}
+
+/** Mark a lesson complete — answering every quiz question is the trigger. */
+export function markComplete(lessonId) {
+  const all = readProgress();
+  const prev = all[lessonId] || { step: 0, total: 0 };
+  all[lessonId] = { ...prev, done: true };
   writeJSON(PROGRESS_KEY, all);
   return all[lessonId];
 }

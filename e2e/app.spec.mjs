@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const LESSON = '#/lesson/dummy';
+// The engine demo lives outside the lesson list; ?lesson=dummy registers it.
+const LESSON = '?lesson=dummy#/lesson/dummy';
 
 const els = (page) => ({
   indicator: page.locator('[data-indicator]'),
@@ -11,8 +12,8 @@ const els = (page) => ({
   auto: page.locator('[data-auto]'),
 });
 
-async function openLesson(page, query = '') {
-  await page.goto(`/${query}${LESSON}`);
+async function openLesson(page) {
+  await page.goto(`/${LESSON}`);
   await expect(page.locator('body[data-ready="true"]')).toBeAttached();
   await expect(page.locator('svg.diagram')).toBeVisible();
 }
@@ -21,17 +22,26 @@ async function pick(page, widget, value) {
   await page.locator(`[data-widget="${widget}"][data-value="${value}"]`).click();
 }
 
-test('home lists the engine demo and opens it', async ({ page }) => {
+test('home lists the four lessons and opens one', async ({ page }) => {
   await page.goto('/');
-  const card = page.locator('[data-lesson-id="dummy"]');
-  await expect(card).toBeVisible();
-  await expect(card.locator('[data-title]')).toHaveText('Engine demo');
-  await expect(card.locator('[data-meta]')).toContainText('engine demo');
+  await expect(page.locator('.hero-title')).toContainText('See how Claude Code actually runs');
+  await expect(page.locator('[data-card]')).toHaveCount(4);
+  await expect(page.locator('[data-lesson-id="dummy"]')).toHaveCount(0);
+  const card = page.locator('[data-lesson-id="l1-agent-loop"]');
+  await expect(card.locator('[data-title]')).toHaveText('The Agent Loop');
+  await expect(card.locator('[data-meta]')).toContainText('6 min');
+  await expect(card.locator('[data-progress]')).toHaveText('not started');
   await card.click();
-  await expect(page).toHaveURL(new RegExp(`${LESSON}$`));
-  await expect(page.locator('.lesson-title')).toHaveText('Engine demo');
+  await expect(page).toHaveURL(/#\/lesson\/l1-agent-loop$/);
+  await expect(page.locator('.lesson-title')).toHaveText('The Agent Loop');
   await expect(page.locator('svg.diagram')).toBeVisible();
-  await expect(els(page).indicator).toHaveText('1 / 4');
+  await expect(els(page).indicator).toHaveText('1 / 7');
+});
+
+test('the engine demo is reachable only through the test fixture', async ({ page }) => {
+  await page.goto('/#/lesson/dummy');
+  await expect(page.locator('body[data-ready="true"]')).toBeAttached();
+  await expect(page.locator('.lesson-title')).toHaveText('Lesson not found');
 });
 
 test('the control bar steps forward and back', async ({ page }) => {
@@ -176,7 +186,7 @@ test('a broken lesson falls back to the overview view instead of crashing', asyn
   expect(errors).toEqual([]);
 
   await page.locator('.back').click();
-  await expect(page.locator('[data-lesson-id="dummy"]')).toBeVisible();
+  await expect(page.locator('[data-lesson-id="l1-agent-loop"]')).toBeVisible();
 });
 
 test.describe('reduced motion', () => {

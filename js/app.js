@@ -6,7 +6,7 @@
 import { allLessons, getLesson, register } from './lessons/index.js';
 import { validateLesson } from './engine/schema.js';
 import { pickText } from './engine/locale.js';
-import { readLocale, writeLocale, readProgress, markProgress } from './store.js';
+import { readLocale, writeLocale, readProgress, markProgress, markComplete } from './store.js';
 import { applyChrome } from './ui-text.js';
 import { renderHome, renderLesson, renderFallback, renderMissing } from './views.js';
 
@@ -40,6 +40,7 @@ function openLesson(id) {
     lesson,
     locale,
     onStep: (index, total) => markProgress(lesson.id, index, total),
+    onComplete: () => markComplete(lesson.id),
   });
 }
 
@@ -81,15 +82,20 @@ function wireLocaleButtons() {
 }
 
 /**
- * Test hook: `?lesson=broken` registers a deliberately invalid lesson so the
- * data-error fallback can be exercised. It is never part of the normal build's
- * lesson list unless the query parameter is present.
+ * Test hooks. `?lesson=broken` registers a deliberately invalid lesson so the
+ * data-error fallback can be exercised; `?lesson=dummy` registers the engine
+ * demo that exercises every renderer feature. Neither is part of the lesson
+ * list unless the query parameter asks for it.
  */
+const FIXTURES = {
+  broken: () => import('./lessons/broken.js').then((m) => m.broken),
+  dummy: () => import('./lessons/dummy.js').then((m) => m.dummy),
+};
+
 async function loadTestFixture() {
   const requested = new URLSearchParams(window.location.search).get('lesson');
-  if (requested !== 'broken') return;
-  const module = await import('./lessons/broken.js');
-  register(module.broken);
+  const load = FIXTURES[requested];
+  if (load) register(await load());
 }
 
 async function boot() {

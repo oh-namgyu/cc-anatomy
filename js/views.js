@@ -5,9 +5,11 @@
  */
 
 import { pickText } from './engine/locale.js';
+import { paintText } from './engine/richtext.js';
 import { createDiagram } from './engine/diagram.js';
 import { createPlayer } from './engine/player.js';
 import { createWidgets } from './engine/widgets.js';
+import { createQuiz } from './engine/quiz.js';
 import { findScenario } from './engine/schema.js';
 import { applyChrome, t } from './ui-text.js';
 
@@ -22,9 +24,10 @@ function mountView(mount, fragment, locale) {
   applyChrome(mount, locale);
 }
 
+/** not started / viewed / completed — the three states a home card shows. */
 function progressLabel(entry, locale) {
-  if (!entry) return '';
-  return entry.done ? t('finished', locale) : `${t('started', locale)} ${entry.step + 1}/${entry.total}`;
+  if (!entry) return t('notStarted', locale);
+  return entry.done ? t('completed', locale) : t('viewed', locale);
 }
 
 function buildCard(lesson, ordinal, locale, progress) {
@@ -34,15 +37,15 @@ function buildCard(lesson, ordinal, locale, progress) {
   link.dataset.lessonId = lesson.id;
   frag.querySelector('[data-num]').textContent = String(ordinal).padStart(2, '0');
   frag.querySelector('[data-title]').textContent = pickText(lesson.title, locale);
-  frag.querySelector('[data-intro]').textContent = pickText(lesson.intro, locale);
+  paintText(frag.querySelector('[data-intro]'), pickText(lesson.intro, locale));
   const meta = [];
   if (lesson.minutes) meta.push(`${lesson.minutes} ${t('minutes', locale)}`);
   if (lesson.demo) meta.push(t('demoTag', locale));
   frag.querySelector('[data-meta]').textContent = meta.join(' · ');
   const mark = frag.querySelector('[data-progress]');
-  const label = progressLabel(progress[lesson.id], locale);
-  mark.textContent = label;
-  mark.hidden = !label;
+  const entry = progress[lesson.id];
+  mark.textContent = progressLabel(entry, locale);
+  mark.dataset.state = entry ? (entry.done ? 'completed' : 'viewed') : 'none';
   return frag;
 }
 
@@ -59,7 +62,7 @@ export function renderHome(mount, { lessons, locale, progress }) {
 export function renderFallback(mount, { lesson, errors, locale }) {
   const frag = clone('tpl-fallback');
   frag.querySelector('[data-title]').textContent = pickText(lesson.title, locale) || lesson.id;
-  frag.querySelector('[data-intro]').textContent = pickText(lesson.intro, locale);
+  paintText(frag.querySelector('[data-intro]'), pickText(lesson.intro, locale));
   const list = frag.querySelector('[data-errors]');
   for (const message of errors) {
     const item = document.createElement('li');
@@ -91,14 +94,37 @@ function lessonEls(root) {
     prev: q('[data-prev]'),
     next: q('[data-next]'),
     auto: q('[data-auto]'),
+    quizOpen: q('[data-quiz-open]'),
+    quiz: q('[data-quiz]'),
+    sources: q('[data-sources]'),
+    sourceList: q('[data-source-list]'),
+    asOf: q('[data-as-of]'),
   };
+}
+
+/** `lesson.sources` as external links. Links are not resource loads. */
+function paintSources(els, lesson) {
+  const urls = Array.isArray(lesson.sources) ? lesson.sources : [];
+  els.sources.hidden = urls.length === 0;
+  els.sourceList.textContent = '';
+  for (const url of urls) {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = url;
+    item.appendChild(link);
+    els.sourceList.appendChild(item);
+  }
+  els.asOf.textContent = lesson.asOf || '';
 }
 
 /**
  * Lesson view: widget zone, diagram canvas, explanation panel, control bar.
  * @returns {{setLocale: (l: string) => void, destroy: () => void}}
  */
-export function renderLesson(mount, { lesson, locale, onStep }) {
+export function renderLesson(mount, { lesson, locale, onStep, onComplete }) {
   let current = locale;
   const frag = clone('tpl-lesson');
   mount.textContent = '';
@@ -109,11 +135,18 @@ export function renderLesson(mount, { lesson, locale, onStep }) {
 
   function paintHead() {
     els.title.textContent = pickText(lesson.title, current);
-    els.intro.textContent = pickText(lesson.intro, current);
+    paintText(els.intro, pickText(lesson.intro, current));
+  }
+
+  function showQuiz() {
+    if (!els.quiz.hidden) return;
+    els.quiz.hidden = false;
+    els.quizOpen.setAttribute('aria-expanded', 'true');
   }
 
   function paintStepline(index, total) {
     els.stepline.textContent = `${t('stepOf', current)} ${index + 1} / ${total}`;
+    if (index >= total - 1) showQuiz();
     if (onStep) onStep(index, total);
   }
 
@@ -129,7 +162,13 @@ export function renderLesson(mount, { lesson, locale, onStep }) {
     onChange: (selection) => player.load(findScenario(lesson, selection)),
   });
 
+  const quiz = createQuiz(els.quiz, lesson, { locale: current, onComplete });
+
+  els.quizOpen.addEventListener('click', showQuiz);
+  els.quizOpen.hidden = !Array.isArray(lesson.quiz) || lesson.quiz.length === 0;
+
   paintHead();
+  paintSources(els, lesson);
   applyChrome(mount, current);
   player.load(widgets.getScenario());
 
@@ -140,10 +179,12 @@ export function renderLesson(mount, { lesson, locale, onStep }) {
       applyChrome(mount, next);
       widgets.setLocale(next);
       player.setLocale(next);
+      quiz.setLocale(next);
     },
     destroy() {
       player.destroy();
       widgets.destroy();
+      quiz.destroy();
     },
   };
 }

@@ -8,6 +8,7 @@
  */
 
 import { pickText } from './locale.js';
+import { paintText } from './richtext.js';
 
 export const AUTO_MS = 1600;
 
@@ -80,7 +81,7 @@ export function createPlayer({ diagram, els, locale = 'en', autoMs = AUTO_MS, on
     if (!step) return;
     diagram.setActive([step.node]);
     diagram.pulse(step.edge || null);
-    els.explain.textContent = pickText(step.explain, current);
+    paintText(els.explain, pickText(step.explain, current));
     paintBadge(step);
     els.indicator.textContent = `${index + 1} / ${total()}`;
     dotEls.forEach((dot, i) => {
