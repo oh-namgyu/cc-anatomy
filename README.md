@@ -179,7 +179,7 @@ validator error codes and the citation rule.
 
 ## License
 
-[MIT](LICENSE) © 2026 oh-namgyu.
+MIT — see [LICENSE](LICENSE). Security policy: [SECURITY.md](SECURITY.md).
 
 "Claude" and "Anthropic" are trademarks of Anthropic. This project is not
 affiliated with, endorsed by, or sponsored by Anthropic, and uses no Anthropic
