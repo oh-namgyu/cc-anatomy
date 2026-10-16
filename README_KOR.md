@@ -161,8 +161,6 @@ npx playwright test                     # python3 정적 서버 대상 e2e
 
 - **L5 — 서브에이전트**: Agent 도구를 통한 위임, 백그라운드 완료 알림.
 - **L6 — 권한**: allowlist 매칭과 plan 모드 게이트.
-- **스크린리더 대응**: 현재의 키보드 조작·`prefers-reduced-motion` 지원을 넘어, 스텝 변경을
-  읽어 주는 live region 추가.
 
 ---
 

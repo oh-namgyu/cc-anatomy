@@ -172,8 +172,6 @@ validator error codes and the citation rule.
 
 - **L5 — Subagents**: delegation through the Agent tool, background completion.
 - **L6 — Permissions**: allowlist matching and the plan-mode gate.
-- **Screen-reader pass**: a live region narrating step changes, beyond the
-  current keyboard and `prefers-reduced-motion` support.
 
 ---
 
